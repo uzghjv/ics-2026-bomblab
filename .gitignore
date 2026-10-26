@@ -14,3 +14,17 @@ __pycache__/
 !/teaching/*.c
 !/teaching/Makefile
 !/teaching/README.md
+opencode.json
+analysis.md
+guide.md
+phase_00.S
+phase_01.S
+phase_02.S
+phase_03.S
+phase_04.S
+phase_05.S
+phase_06.S
+guidetutor.md
+/tutor/phase_00.gdb.txt
+plan.md
+phase01.md

@@ -24,6 +24,15 @@ int solve_phase_1(uint64_t challenge, char *out, size_t cap) {
     size_t count = 0;
     (void)challenge;
     // TODO: 根据 phase_01 的汇编，用 challenge 算出口令中的各个整数，依次存入 values，并把 count 改为整数个数。
+    uint32_t lo=(uint32_t)challenge;
+    uint32_t hi=(uint32_t)(challenge>>32);
+    uint32_t mid=(uint32_t)(challenge>>16);
+    uint32_t s0=(lo+2u*hi)^0x3053u;
+    uint32_t s1=(5u*hi+mid)^0xa2c3u;
+    uint32_t s2=(3u*s1)^(lo+0x1dceu);
+    values[0]=s2^s0;
+    count=1;
+
     return write_answer(out, cap, values, count);
 }
 
@@ -32,14 +41,43 @@ int solve_phase_2(uint64_t challenge, char *out, size_t cap) {
     size_t count = 0;
     (void)challenge;
     // TODO: 根据 phase_02 的汇编，用 challenge 算出口令中的各个整数，依次存入 values，并把 count 改为整数个数。
+    uint32_t v[6];
+    int shift=28;
+    v[0]=3*((challenge>>40)&0x1f);
+    values[0]=v[0];
+    for (int i=1;i<6;i++){
+        v[i]=(((challenge>>shift)&0xf)+i)^(3*v[i-1]);
+        values[i]=v[i];
+        shift+=5;
+    }
+    count=6;
     return write_answer(out, cap, values, count);
 }
-
+static uint32_t p3_dispatch(uint32_t index, uint32_t x) {
+    switch (index) {
+        case 0: return (2u*x)^0x8874u;          /* p3_case_5 */
+        case 1: return (4u*x)^0xbe63u;          /* p3_case_1 */
+        case 2: return 5u*x+0x15531u;           /* p3_case_7 */
+        case 3: return (x^0x56d4u)+(x>>2);    /* p3_case_2 */
+        case 4: return (x^0x6780u)+(x>>1);    /* p3_case_6 */
+        case 5: return 3u*x+0x899fu;            /* p3_case_4 */
+        case 6: return 5u*x+0xe682u;            /* p3_case_3 */
+        case 7: return 5u*x+0x2964u;            /* p3_case_0 */
+        default: return 0;
+    }
+}
 int solve_phase_3(uint64_t challenge, char *out, size_t cap) {
     uint32_t values[MAX_FIELDS] = {0};
     size_t count = 0;
     (void)challenge;
     // TODO: 根据 phase_03 的汇编，用 challenge 算出口令中的各个整数，依次存入 values，并把 count 改为整数个数。
+    uint32_t v[2];
+    v[0]=challenge&7u;
+    uint32_t u=challenge>>3;
+    int esi=(uint32_t)(challenge>>32)^u;
+    values[0]=v[0];
+    values[1]=p3_dispatch(v[0],esi);
+    count=2;
     return write_answer(out, cap, values, count);
 }
 
